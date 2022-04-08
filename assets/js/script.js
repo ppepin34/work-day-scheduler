@@ -1,19 +1,21 @@
-var currentTime = moment();
 var currentDay = document.getElementById("currentDay");
-
-// update day to current day
-var updateDay = function () {
-    currentDay.innerHTML = currentTime.format("dddd, MMMM Do")
-};
+var toDo = [];
 
 // compare currentTime against ids for class assignment
 var updateTime = function () {
-    // pull ids from html
-    var times = $("li p").toArray();
 
-    //gets currentHour in military time
-    var currentHour = currentTime.format("H");
-    currentHour = parseInt(currentHour);
+    // update time
+    var currentTime = moment();
+
+    // update day to current day
+    currentDay.innerHTML = currentTime.format("dddd, MMMM Do");
+
+    // pull ids from html
+    var times = $("form textarea").toArray();
+
+    // gets hour in military time
+    var hour = currentTime.format("H");
+    hour = parseInt(hour);
 
     // run for loop to check hour against ID and update classes
     for (var i = 0; i < times.length; i++) {
@@ -21,29 +23,66 @@ var updateTime = function () {
         var id = parseInt(times[i].id);
 
         //check for past
-        if (currentHour < id) {
+        if (hour < id) {
             $(times[i]).removeClass("present past")
             $(times[i]).addClass("future");
         }
 
         // check for present
-        else if (currentHour === id) {
+        else if (hour === id) {
             $(times[i]).removeClass("future past")
             $(times[i]).addClass("present");
         }
 
         // check for future
-        else if (currentHour > id) {
+        else if (hour > id) {
             $(times[i]).removeClass("present future")
             $(times[i]).addClass("past");
         };
     };
-}
+};
 
-updateDay();
+$(".container textarea").click(function () {
+    event.preventDefault();
+
+    $(this).removeAttr("readonly")
+    .removeClass("past present future");
+});
+
+$(".time-block").submit(function (event) {
+
+    event.preventDefault();
+
+    var toDoItem = this.children[1];
+
+    // push id and text to array
+    var id = toDoItem.id;
+    var text = toDoItem.value;
+
+    var toDoObj = {
+        id: id,
+        text: text
+    };
+
+    console.log(toDoObj);
+
+    toDo.push(toDoObj);
+
+    //rearrange array?
+    toDo.sort((a, b) => a.id - b.id);
+
+    console.log(toDo)
+
+    //reset css
+    $(toDoItem).attr("readonly");
+
+    // updateTime
+    updateTime();
+});
+
 updateTime();
 
 // interval to update
-setInterval(function(){
+setInterval(function () {
     updateTime();
 }, 300000)
