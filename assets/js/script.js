@@ -46,7 +46,7 @@ $(".container textarea").click(function () {
     event.preventDefault();
 
     $(this).removeAttr("readonly")
-    .removeClass("past present future");
+        .removeClass("past present future");
 });
 
 $(".time-block").submit(function (event) {
@@ -64,21 +64,64 @@ $(".time-block").submit(function (event) {
         text: text
     };
 
-    console.log(toDoObj);
+    if (toDo.length === 0) {
+        toDo.push(toDoObj)
+    } else {
+        for (var i = 0; i < toDo.length; i++) {
+            console.log(i);
+            if (toDo[i].id === id) {
+                toDo[i].text = text
+            }
+            else {
+                if (i === toDo.length - 1) {
+                    toDo.push(toDoObj)
+                }
+            }
+        }
+    }
 
-    toDo.push(toDoObj);
-
-    //rearrange array?
+    // rearrange array?
     toDo.sort((a, b) => a.id - b.id);
 
-    console.log(toDo)
+    console.log(toDo);
 
-    //reset css
+    // reset css
     $(toDoItem).attr("readonly");
+
+    // save toDo to localStorage
+    localStorage.setItem("savedTasks", JSON.stringify(toDo));
 
     // updateTime
     updateTime();
 });
+
+// load savedTasks on reload
+var loadTasks = function () {
+
+    // get tasks from localStorage
+    var savedTasks = localStorage.getItem("savedTasks");
+
+    //check to see if tasks have been save, parse back into array of objects
+    if (savedTasks === null) {
+        return false;
+    };
+
+    toDo = JSON.parse(savedTasks);
+
+    // assign each to it's proper space on 
+    for (var i = 0; i < toDo.length; i++) {
+
+        // find document that matches id
+        if (document.getElementById(toDo[i].id)){
+            
+            //replace text in textarea with .text
+            document.getElementById(toDo[i].id).value = toDo[i].text
+        }
+
+
+    }
+}
+loadTasks();
 
 updateTime();
 
